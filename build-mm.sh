@@ -13,6 +13,9 @@ MM_DIR="$ROOT_DIR/micro-manager"
 THIRDPARTY_DIR="$ROOT_DIR/3rdpartypublic"
 BOOST_DIR="$THIRDPARTY_DIR/boost-linux-x86_64"
 
+# start with clean install each time
+rm -rf $IJ_DIR $MM_DIR $THIRDPARTY_DIR
+
 # Install ImageJ/Fiji
 
 if [ ! -f "fiji-linux64.zip" ]; then
@@ -44,23 +47,24 @@ fi
 # Boost shipped by Ubuntu is now to recent and does not work well with Micro-manager.
 # So we install an older version (1.57).
 
-if [ ! -e "$BOOST_DIR" ]; then
-	mkdir -p "$BOOST_DIR"
-	cd "$BOOST_DIR"
-    wget "https://anaconda.org/anaconda/boost/1.57.0/download/linux-64/boost-1.57.0-4.tar.bz2"
-    tar -jxvf "boost-1.57.0-4.tar.bz2"
-    rm "boost-1.57.0-4.tar.bz2"
-    cd ../../
-fi
+# if [ ! -e "$BOOST_DIR" ]; then
+# 	mkdir -p "$BOOST_DIR"
+# 	cd "$BOOST_DIR"
+#     wget "https://anaconda.org/anaconda/boost/1.57.0/download/linux-64/boost-1.57.0-4.tar.bz2"
+#     tar -jxvf "boost-1.57.0-4.tar.bz2"
+#     rm "boost-1.57.0-4.tar.bz2"
+#     cd ../../
+# fi
 
 # Clone the git repository
 
 if [ ! -e "$MM_DIR" ]; then
-  git clone https://github.com/micro-manager/micro-manager.git
+  git clone https://github.com/CougPhenomics/micro-manager.git
 fi
 
 cd "$MM_DIR"
 if [ -d ".git" ]; then
+  git checkout ubuntu1804
   VERSION_ID=$(git rev-parse --short HEAD)
 elif [ -d ".svn" ]; then
   VERSION_ID="svn-"$(svn info --show-item=revision .)
@@ -72,9 +76,9 @@ fi
 
 ./autogen.sh
 ./configure --enable-imagej-plugin="$IJ_DIR" \
-            --with-ij-jar="$IJ_JAR" \
-            --with-boost="$BOOST_DIR" \
-            LDFLAGS=-L"$BOOST_DIR/lib"
+            --with-ij-jar="$IJ_JAR" 
+            # --with-boost="$BOOST_DIR" \
+            # LDFLAGS=-L"$BOOST_DIR/lib"
 
 make fetchdeps
 make --jobs=`nproc --all`
