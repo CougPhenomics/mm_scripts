@@ -11,7 +11,9 @@ ROOT_DIR=$(pwd)
 IJ_DIR="$ROOT_DIR/Fiji.app"
 MM_DIR="$ROOT_DIR/micro-manager"
 THIRDPARTY_DIR="$ROOT_DIR/3rdpartypublic"
-BOOST_DIR="$THIRDPARTY_DIR/boost-linux-x86_64"
+# BOOST_DIR="$THIRDPARTY_DIR/boost-linux-x86_64"
+# BOOST_LIB_DIR="$BOOST_DIR/lib"
+BOOST_LIB_DIR="/usr/lib/x86_64-linux-gnu"  #system boost lib location
 
 # start with clean install each time
 rm -rf $IJ_DIR $MM_DIR $THIRDPARTY_DIR
@@ -76,9 +78,9 @@ fi
 
 ./autogen.sh
 ./configure --enable-imagej-plugin="$IJ_DIR" \
-            --with-ij-jar="$IJ_JAR" 
-            # --with-boost="$BOOST_DIR" \
-            # LDFLAGS=-L"$BOOST_DIR/lib"
+            --with-ij-jar="$IJ_JAR" \
+            # --with-boost="$BOOST_DIR" 
+            LDFLAGS=-L"$BOOST_LIB_DIR"
 
 make fetchdeps
 make --jobs=`nproc --all`
@@ -89,7 +91,7 @@ make install
 cp "$MM_DIR/bindist/any-platform/MMConfig_demo.cfg" "$IJ_DIR"
 
 # Copy boost libraries to ImageJ folder
-cp --no-dereference --recursive "${BOOST_DIR}"/lib/. "${IJ_DIR}/"
+cp --no-dereference --recursive "${BOOST_LIB_DIR}" "${IJ_DIR}/"
 
 cd ../
 
