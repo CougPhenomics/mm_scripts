@@ -59,14 +59,13 @@ fi
 # fi
 
 # Clone the git repository
-
 if [ ! -e "$MM_DIR" ]; then
-  git clone https://github.com/CougPhenomics/micro-manager.git
+  git clone https://github.com/micro-manager/micro-manager.git
 fi
 
 cd "$MM_DIR"
 if [ -d ".git" ]; then
-  git checkout ubuntu1804
+  git checkout master
   VERSION_ID=$(git rev-parse --short HEAD)
 elif [ -d ".svn" ]; then
   VERSION_ID="svn-"$(svn info --show-item=revision .)
