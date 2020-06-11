@@ -4,7 +4,8 @@ set -e
 # Script used to build MM from source (on Linux/Ubuntu)
 
 # Dependencies (ubuntu / debian)
-# sudo apt install build-essential autoconf automake libtool pkg-config zlib1g-dev swig ant clojure
+# sudo apt install build-essential default-jre default-jdk autoconf automake libtool pkg-config zlib1g-dev swig ant clojure libboost-all-dev libjogl2-java libgluegen2-rt-java
+# also want -> sudo apt install libgphoto2-dev libusb-dev libdc1394-dev libhidapi-dev libfreeimageplus-dev libfreeimageplus-doc
 
 
 ROOT_DIR=$(pwd)
@@ -16,7 +17,7 @@ THIRDPARTY_DIR="$ROOT_DIR/3rdpartypublic"
 BOOST_LIB_DIR="/usr/lib/x86_64-linux-gnu"  #system boost lib location
 
 # start with clean install each time
-rm -rf $IJ_DIR $MM_DIR $THIRDPARTY_DIR
+rm -rf $IJ_DIR $MM_DIR
 
 # Install ImageJ/Fiji
 
@@ -52,20 +53,20 @@ fi
 # if [ ! -e "$BOOST_DIR" ]; then
 # 	mkdir -p "$BOOST_DIR"
 # 	cd "$BOOST_DIR"
-#     wget "https://anaconda.org/anaconda/boost/1.57.0/download/linux-64/boost-1.57.0-4.tar.bz2"
-#     tar -jxvf "boost-1.57.0-4.tar.bz2"
-#     rm "boost-1.57.0-4.tar.bz2"
+#     wget "https://anaconda.org/anaconda/boost/1.65.0/download/linux-64/boost-1.65.0-py36_4.tar.bz2"
+#     tar -jxvf "boost-1.65.0-py36_4.tar.bz2"
+#     # rm "boost-1.67.0-py27_4.tar.bz2"
 #     cd ../../
 # fi
 
 # Clone the git repository
 if [ ! -e "$MM_DIR" ]; then
-  git clone https://github.com/micro-manager/micro-manager.git
+  git clone https://github.com/CougPhenomics/micro-manager.git
 fi
 
 cd "$MM_DIR"
 if [ -d ".git" ]; then
-  git checkout master
+  git checkout ubuntu
   VERSION_ID=$(git rev-parse --short HEAD)
 elif [ -d ".svn" ]; then
   VERSION_ID="svn-"$(svn info --show-item=revision .)
@@ -78,8 +79,8 @@ fi
 ./autogen.sh
 ./configure --enable-imagej-plugin="$IJ_DIR" \
             --with-ij-jar="$IJ_JAR" \
-            # --with-boost="$BOOST_DIR" 
             LDFLAGS=-L"$BOOST_LIB_DIR"
+            # --with-boost="$BOOST_DIR" 
 
 make fetchdeps
 make --jobs=`nproc --all`
